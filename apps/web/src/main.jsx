@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BarChart3, Boxes, ClipboardPlus, EyeOff, LayoutDashboard, LogOut, MapPinned, PackagePlus, ShoppingCart, UsersRound } from 'lucide-react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import './styles.css';
 import logoUrl from './assets/invcontrol-logo.svg';
 import { api } from './api/client.js';
@@ -167,6 +168,7 @@ function App() {
           onLogout={logout}
         />
       )}
+      <SpeedInsights />
     </div>
   );
 }
