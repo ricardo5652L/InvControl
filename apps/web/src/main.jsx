@@ -8,6 +8,7 @@ import { api, API_URL } from './api/client.js';
 import NavButton from './components/NavButton.jsx';
 import ProfileBubble from './components/ProfileBubble.jsx';
 import ProfileModal from './components/ProfileModal.jsx';
+import Dashboard from './pages/Dashboard.jsx';
 
 const THEME_KEY = 'invcontrol-theme';
 
@@ -131,32 +132,6 @@ function Login({ onLogin }) {
   );
 }
 
-function Dashboard() {
-  const [data, setData] = useState(null);
-
-  useEffect(() => {
-    api('/dashboard').then(setData).catch(console.error);
-  }, []);
-
-  return (
-    <section>
-      <PageHeader title="Dashboard" subtitle="Indicadores principales del negocio" />
-      <div className="kpis">
-        <Kpi label="Ventas hoy" value={currency(data?.total_sales_today)} />
-        <Kpi label="Ordenes hoy" value={data?.orders_today || 0} />
-        <Kpi label="Stock bajo" value={data?.low_stock_count || 0} tone="warn" />
-        <Kpi label="Valor inventario" value={currency(data?.inventory_value)} />
-      </div>
-      <section className="panel">
-        <h2>Ultimos movimientos</h2>
-        <DataTable
-          columns={['Producto', 'Tipo', 'Cantidad', 'Motivo']}
-          rows={(data?.recent_movements || []).map((movement) => [movement.product, movement.type, movement.quantity, movement.reason || '-'])}
-        />
-      </section>
-    </section>
-  );
-}
 
 function QuickCreate({ setView, isAdmin }) {
   const actions = [
