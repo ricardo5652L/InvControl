@@ -5,7 +5,7 @@ import { canAccessStore, requireAdmin, requireAuth } from './middleware.js';
 import { db, nextId, publicProduct } from './store.js';
 import { config } from './config.js';
 import { loginLimiter } from './security.js';
-import { validateCreateProduct, validateUpdateProduct, validateCreateUser, validateUpdateUser, validateUpdateProfile, validateInventoryMovement, validateCreateSale } from './validators.js';
+import { validateCreateProduct, validateUpdateProduct, validateCreateUser, validateUpdateUser, validateUpdateProfile, validateInventoryMovement, validateCreateSale, validateCreateStore, validateUpdateStore, validateSalesReportQuery, validateExportReportQuery } from './validators.js';
 
 export const router = Router();
 
@@ -118,8 +118,10 @@ router.get('/stores', requireAdmin, (_req, res) => {
 router.post('/stores', requireAdmin, (req, res) => {
   const { name, code, address, phone, latitude, longitude } = req.body;
 
-  if (!name || !code || latitude === undefined || longitude === undefined) {
-    return res.status(400).json({ message: 'Nombre, codigo, latitud y longitud son obligatorios' });
+  // Validaciones básicas de datos
+  const validation = validateCreateStore(req.body);
+  if (!validation.valid) {
+    return res.status(400).json({ message: validation.errors[0] });
   }
 
   if (db.stores.some((store) => store.code.toLowerCase() === String(code).toLowerCase())) {
@@ -144,6 +146,12 @@ router.post('/stores', requireAdmin, (req, res) => {
 router.put('/stores/:id', requireAdmin, (req, res) => {
   const store = db.stores.find((item) => item.id === Number(req.params.id));
   if (!store) return res.status(404).json({ message: 'Tienda no encontrada' });
+
+  // Validaciones de datos
+  const validation = validateUpdateStore(req.body);
+  if (!validation.valid) {
+    return res.status(400).json({ message: validation.errors[0] });
+  }
 
   const { name, code, address, phone, latitude, longitude, is_active } = req.body;
   if (name !== undefined) store.name = String(name).trim();
@@ -348,6 +356,12 @@ router.get('/reports/low-stock', (_req, res) => {
 });
 
 router.get('/reports/sales', (req, res) => {
+  // Validaciones de parámetros de consulta
+  const validation = validateSalesReportQuery(req.query);
+  if (!validation.valid) {
+    return res.status(400).json({ message: validation.errors[0] });
+  }
+
   const from = req.query.date_from ? new Date(String(req.query.date_from)) : null;
   const to = req.query.date_to ? new Date(String(req.query.date_to)) : null;
   const sales = db.sales.filter((sale) => {
@@ -365,6 +379,12 @@ router.get('/reports/sales', (req, res) => {
 });
 
 router.get('/reports/export.csv', (req, res) => {
+  // Validaciones de parámetros de consulta
+  const validation = validateExportReportQuery(req.query);
+  if (!validation.valid) {
+    return res.status(400).json({ message: validation.errors[0] });
+  }
+
   const type = req.query.type || 'products';
   let rows = [];
 

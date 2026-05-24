@@ -433,3 +433,175 @@ export function validateCreateSale(body) {
     errors
   };
 }
+
+/**
+ * Valida los datos para crear una tienda (POST /api/stores).
+ * @param {Object} body - Cuerpo de la solicitud
+ * @returns {{ valid: boolean, errors: string[] }} - Resultado de la validación
+ */
+export function validateCreateStore(body) {
+  const errors = [];
+
+  // name obligatorio - debe ser string no vacío
+  if (!body.name || !isValidNonEmptyString(body.name)) {
+    errors.push('El nombre de la tienda es obligatorio y debe ser un texto no vacío');
+  }
+
+  // code obligatorio - debe ser string no vacío
+  if (!body.code || !isValidNonEmptyString(body.code)) {
+    errors.push('El código de la tienda es obligatorio y debe ser un texto no vacío');
+  }
+
+  // latitude obligatorio - debe ser número válido
+  if (body.latitude === undefined || body.latitude === null || body.latitude === '') {
+    errors.push('La latitud es obligatoria y debe ser un número válido');
+  } else if (!isValidNumber(body.latitude)) {
+    errors.push('La latitud debe ser un número válido');
+  }
+
+  // longitude obligatorio - debe ser número válido
+  if (body.longitude === undefined || body.longitude === null || body.longitude === '') {
+    errors.push('La longitud es obligatoria y debe ser un número válido');
+  } else if (!isValidNumber(body.longitude)) {
+    errors.push('La longitud debe ser un número válido');
+  }
+
+  // address opcional - si viene, debe ser string
+  if (body.address !== undefined && body.address !== null && body.address !== '') {
+    if (typeof body.address !== 'string') {
+      errors.push('La dirección debe ser un texto');
+    }
+  }
+
+  // phone opcional - si viene, debe ser string
+  if (body.phone !== undefined && body.phone !== null && body.phone !== '') {
+    if (typeof body.phone !== 'string') {
+      errors.push('El teléfono debe ser un texto');
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+/**
+ * Valida los datos para actualizar una tienda (PUT /api/stores/:id).
+ * Solo valida los campos que vienen en el body, no requiere todos.
+ * @param {Object} body - Cuerpo de la solicitud
+ * @returns {{ valid: boolean, errors: string[] }} - Resultado de la validación
+ */
+export function validateUpdateStore(body) {
+  const errors = [];
+
+  // Si viene name, debe ser string no vacío
+  if (body.name !== undefined) {
+    if (!isValidNonEmptyString(body.name)) {
+      errors.push('El nombre de la tienda debe ser un texto no vacío');
+    }
+  }
+
+  // Si viene code, debe ser string no vacío
+  if (body.code !== undefined) {
+    if (!isValidNonEmptyString(body.code)) {
+      errors.push('El código de la tienda debe ser un texto no vacío');
+    }
+  }
+
+  // Si viene latitude, debe ser número válido
+  if (body.latitude !== undefined) {
+    if (!isValidNumber(body.latitude)) {
+      errors.push('La latitud debe ser un número válido');
+    }
+  }
+
+  // Si viene longitude, debe ser número válido
+  if (body.longitude !== undefined) {
+    if (!isValidNumber(body.longitude)) {
+      errors.push('La longitud debe ser un número válido');
+    }
+  }
+
+  // Si viene address, debe ser string
+  if (body.address !== undefined) {
+    if (body.address !== null && body.address !== '' && typeof body.address !== 'string') {
+      errors.push('La dirección debe ser un texto');
+    }
+  }
+
+  // Si viene phone, debe ser string
+  if (body.phone !== undefined) {
+    if (body.phone !== null && body.phone !== '' && typeof body.phone !== 'string') {
+      errors.push('El teléfono debe ser un texto');
+    }
+  }
+
+  // Si viene is_active, se convierte a boolean (ya funciona en el código actual)
+  // No requiere validación especial
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+/**
+ * Valida los parámetros de consulta para el reporte de ventas (GET /api/reports/sales).
+ * @param {Object} query - Parámetros de consulta
+ * @returns {{ valid: boolean, errors: string[] }} - Resultado de la validación
+ */
+export function validateSalesReportQuery(query) {
+  const errors = [];
+
+  // date_from opcional - debe ser fecha válida si viene
+  if (query.date_from !== undefined && query.date_from !== null && query.date_from !== '') {
+    const fromDate = new Date(String(query.date_from));
+    if (isNaN(fromDate.getTime())) {
+      errors.push('La fecha de inicio debe ser una fecha válida');
+    }
+  }
+
+  // date_to opcional - debe ser fecha válida si viene
+  if (query.date_to !== undefined && query.date_to !== null && query.date_to !== '') {
+    const toDate = new Date(String(query.date_to));
+    if (isNaN(toDate.getTime())) {
+      errors.push('La fecha de fin debe ser una fecha válida');
+    }
+  }
+
+  // Si ambas vienen, date_from no debe ser posterior a date_to
+  if (query.date_from && query.date_to) {
+    const fromDate = new Date(String(query.date_from));
+    const toDate = new Date(String(query.date_to));
+    if (!isNaN(fromDate.getTime()) && !isNaN(toDate.getTime()) && fromDate > toDate) {
+      errors.push('La fecha de inicio no puede ser posterior a la fecha de fin');
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+/**
+ * Valida los parámetros de consulta para exportar reporte (GET /api/reports/export.csv).
+ * @param {Object} query - Parámetros de consulta
+ * @returns {{ valid: boolean, errors: string[] }} - Resultado de la validación
+ */
+export function validateExportReportQuery(query) {
+  const errors = [];
+
+  // type opcional - solo puede ser products o sales
+  if (query.type !== undefined && query.type !== null && query.type !== '') {
+    if (!['products', 'sales'].includes(String(query.type))) {
+      errors.push('El tipo de reporte debe ser products o sales');
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
