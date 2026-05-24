@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { config } from './config.js';
 
 export function requireAuth(req, res, next) {
   const header = req.headers.authorization || '';
@@ -9,7 +10,7 @@ export function requireAuth(req, res, next) {
   }
 
   try {
-    req.user = jwt.verify(token, process.env.JWT_SECRET || 'dev_secret');
+    req.user = jwt.verify(token, config.JWT_SECRET);
     return next();
   } catch {
     return res.status(401).json({ message: 'Token invalido' });

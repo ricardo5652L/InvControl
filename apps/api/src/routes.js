@@ -3,6 +3,7 @@ import { Router } from 'express';
 import jwt from 'jsonwebtoken';
 import { canAccessStore, requireAdmin, requireAuth } from './middleware.js';
 import { db, nextId, publicProduct } from './store.js';
+import { config } from './config.js';
 
 export const router = Router();
 
@@ -16,8 +17,8 @@ router.post('/auth/login', async (req, res) => {
 
   const store = db.stores.find((item) => item.id === user.storeId);
   const payload = { id: user.id, storeId: user.storeId, storeName: store?.name || null, name: user.name, email: user.email, role: user.role, photoUrl: user.photoUrl || null };
-  const token = jwt.sign(payload, process.env.JWT_SECRET || 'dev_secret', {
-    expiresIn: process.env.JWT_EXPIRES_IN || '1h'
+  const token = jwt.sign(payload, config.JWT_SECRET, {
+    expiresIn: config.JWT_EXPIRES_IN
   });
 
   return res.json({ token, user: payload });

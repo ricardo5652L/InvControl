@@ -1,11 +1,11 @@
 import dotenv from 'dotenv';
 import { createApp } from './app.js';
+import { config } from './config.js';
 
 dotenv.config();
 
-const port = Number(process.env.PORT || 3000);
 const app = createApp();
 
-app.listen(port, () => {
-  console.log(`InvControl API listening on http://localhost:${port}/api`);
+app.listen(config.PORT, () => {
+  console.log(`InvControl API listening on http://localhost:${config.PORT}/api`);
 });
