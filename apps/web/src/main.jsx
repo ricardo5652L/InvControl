@@ -1,10 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { AlertTriangle, BarChart3, Boxes, ClipboardPlus, Download, EyeOff, LayoutDashboard, LogOut, MapPinned, PackagePlus, Plus, ReceiptText, Search, ShoppingCart, Store, UserRound, UsersRound } from 'lucide-react';
+import { BarChart3, Boxes, ClipboardPlus, EyeOff, LayoutDashboard, LogOut, MapPinned, PackagePlus, ShoppingCart, UsersRound } from 'lucide-react';
 import './styles.css';
-import { formatCurrency } from './utils.js';
 import logoUrl from './assets/invcontrol-logo.svg';
-import { api, API_URL } from './api/client.js';
+import { api } from './api/client.js';
 import NavButton from './components/NavButton.jsx';
 import ProfileBubble from './components/ProfileBubble.jsx';
 import ProfileModal from './components/ProfileModal.jsx';
@@ -21,10 +20,6 @@ const THEME_KEY = 'invcontrol-theme';
 
 function applyTheme(theme) {
   document.documentElement.dataset.theme = theme || 'system';
-}
-
-function currency(value) {
-  return formatCurrency(value);
 }
 
 function App() {
