@@ -6,9 +6,19 @@ import { db, nextId, publicProduct } from './store.js';
 import { config } from './config.js';
 import { loginLimiter } from './security.js';
 import { validateCreateProduct, validateUpdateProduct, validateCreateUser, validateUpdateUser, validateUpdateProfile, validateInventoryMovement, validateCreateSale, validateCreateStore, validateUpdateStore, validateSalesReportQuery, validateExportReportQuery } from './validators.js';
-import { storesRepository, usersRepository, productsRepository, inventoryRepository, salesRepository, categoriesRepository } from './repositories/index.js';
+import { getRepositories } from './repositories/provider.js';
 
 export const router = Router();
+
+// Obtener repositorios según DATA_SOURCE
+const {
+  storesRepository,
+  usersRepository,
+  productsRepository,
+  inventoryRepository,
+  salesRepository,
+  categoriesRepository
+} = getRepositories();
 
 router.post('/auth/login', loginLimiter, async (req, res) => {
   const { email, password } = req.body;
