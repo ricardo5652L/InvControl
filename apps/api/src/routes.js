@@ -5,6 +5,7 @@ import { canAccessStore, requireAdmin, requireAuth } from './middleware.js';
 import { db, nextId, publicProduct } from './store.js';
 import { config } from './config.js';
 import { loginLimiter } from './security.js';
+import { validateCreateProduct, validateUpdateProduct } from './validators.js';
 
 export const router = Router();
 
@@ -178,8 +179,10 @@ router.post('/products', (req, res) => {
   const { name, sku, category_id, store_id, price, cost = 0, stock_min = 0 } = req.body;
   const storeId = req.user.role === 'admin' ? Number(store_id || req.user.storeId || 1) : Number(req.user.storeId);
 
-  if (!name || !sku || Number(price) < 0) {
-    return res.status(400).json({ message: 'Datos invalidos' });
+  // Validaciones básicas de datos
+  const validation = validateCreateProduct(req.body);
+  if (!validation.valid) {
+    return res.status(400).json({ message: validation.errors[0] });
   }
 
   if (!db.stores.some((store) => store.id === storeId && store.isActive)) {
@@ -212,6 +215,12 @@ router.put('/products/:id', (req, res) => {
   const product = db.products.find((item) => item.id === Number(req.params.id));
   if (!product || !product.isActive) return res.status(404).json({ message: 'Producto no encontrado' });
   if (!canAccessStore(req, product.storeId)) return res.status(403).json({ message: 'Permisos insuficientes' });
+
+  // Validaciones de datos (solo campos opcionales)
+  const validation = validateUpdateProduct(req.body);
+  if (!validation.valid) {
+    return res.status(400).json({ message: validation.errors[0] });
+  }
 
   const fields = req.body;
   if (fields.name !== undefined) product.name = String(fields.name).trim();
