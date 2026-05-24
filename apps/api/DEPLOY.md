@@ -15,7 +15,7 @@ The API currently uses **in-memory data storage** (`DATA_SOURCE=memory`). This i
 DATA_SOURCE=memory
 ```
 
-## Future: MySQL Integration
+### Future: MySQL Integration
 
 In a future stage, the API will be configured to use **MySQL** as the primary data source. MySQL support is already prepared:
 
@@ -80,6 +80,18 @@ In production, ensure:
 - ✅ Tests run without MySQL
 - ✅ Development is fast and no setup needed
 - ✅ MySQL integration is ready for future stages
+
+## Demo Data (MySQL Seeds - Future)
+
+For MySQL demo data, you can use the seed script:
+- `database/migrations/001_init.sql`
+- `database/seeds/001_demo.sql`
+
+Recommended order:
+1) Run migrations from `database/migrations/001_init.sql`
+2) Run seeds from `database/seeds/001_demo.sql`
+
+> Importante: la API **no activa MySQL automáticamente**. El modo por defecto sigue siendo `DATA_SOURCE=memory`.
 
 ## System Endpoints
 
@@ -156,3 +168,4 @@ When ready to migrate to MySQL:
 5. Test thoroughly with production-like data volumes
 
 **Note**: The repositories currently use the memory store. MySQL migration will happen in a separate, dedicated stage.
+
