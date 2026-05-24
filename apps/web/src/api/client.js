@@ -1,4 +1,6 @@
-export const API_URL = import.meta.env.VITE_API_URL || '/api';
+/** Base URL de la API. En local sin VITE_API_URL usa `/api/` (proxy de Vite). */
+const rawApiUrl = import.meta.env.VITE_API_URL || '/api';
+export const API_URL = rawApiUrl.endsWith('/') ? rawApiUrl : `${rawApiUrl}/`;
 
 export async function api(path, options = {}) {
   const token = localStorage.getItem('token');

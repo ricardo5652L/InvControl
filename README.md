@@ -60,6 +60,15 @@ database/
   migrations/
 ```
 
+## Despliegue del frontend (Vercel)
+
+Guía detallada: [apps/web/DEPLOY.md](apps/web/DEPLOY.md).
+
+- Root Directory: `apps/web`
+- Build: `npm run build` → salida en `dist`
+- Variable: `VITE_API_URL=https://URL-DE-TU-API/api`
+- La API se despliega aparte; ver `apps/web/.env.example`.
+
 ## Pendiente para produccion
 
 - Conectar repositorios de API a MySQL.
