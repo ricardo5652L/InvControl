@@ -73,7 +73,6 @@ function App() {
           {user?.role === 'admin' && <NavButton icon={<MapPinned />} label="Tiendas" active={view === 'stores'} onClick={() => setView('stores')} />}
           {user?.role === 'admin' && <NavButton icon={<UsersRound />} label="Usuarios" active={view === 'users'} onClick={() => setView('users')} />}
         </nav>
-        <button className="ghost danger" onClick={logout}><LogOut size={18} /> Salir</button>
       </aside>
       <main className="content">
         <div className="topbar">
@@ -88,7 +87,16 @@ function App() {
         {view === 'stores' && user?.role === 'admin' && <Stores />}
         {view === 'users' && user?.role === 'admin' && <Users />}
       </main>
-      {profileOpen && <ProfileModal currentUser={user} theme={theme} onThemeChange={setTheme} onClose={() => setProfileOpen(false)} onSaved={updateUser} />}
+      {profileOpen && (
+        <ProfileModal
+          currentUser={user}
+          theme={theme}
+          onThemeChange={setTheme}
+          onClose={() => setProfileOpen(false)}
+          onSaved={updateUser}
+          onLogout={logout}
+        />
+      )}
     </div>
   );
 }

@@ -3,7 +3,7 @@ import { Camera, Eye, EyeOff, Store, UserRound, X } from 'lucide-react';
 import { api } from '../api/client.js';
 import { initials } from '../utils/initials.js';
 
-export default function ProfileModal({ currentUser, theme, onThemeChange, onClose, onSaved }) {
+export default function ProfileModal({ currentUser, theme, onThemeChange, onClose, onSaved, onLogout }) {
   const [form, setForm] = useState({
     name: currentUser?.name || '',
     email: currentUser?.email || '',
@@ -93,7 +93,18 @@ export default function ProfileModal({ currentUser, theme, onThemeChange, onClos
             </div>
           </label>
           {message && <p className="error">{message}</p>}
-          <div className="form-actions"><button type="button" onClick={onClose}>Cancelar</button><button className="primary" type="submit">Guardar cambios</button></div>
+          <div className="form-actions">
+            <button type="button" onClick={onClose}>Cancelar</button>
+            <button className="primary" type="submit">Guardar cambios</button>
+          </div>
+
+          {onLogout && (
+            <div className="logout-row">
+              <button type="button" className="ghost danger" onClick={onLogout}>
+                Cerrar sesión
+              </button>
+            </div>
+          )}
         </form>
       </section>
     </div>

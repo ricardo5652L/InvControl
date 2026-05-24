@@ -292,7 +292,10 @@ h2 {
   background:
     radial-gradient(circle at 85% 8%, color-mix(in srgb, var(--cyan) 8%, transparent), transparent 26%),
     linear-gradient(135deg, var(--bg), var(--bg-soft));
+  min-width: 0;
+  overflow-x: clip;
 }
+
 
 .topbar {
   display: flex;
@@ -386,6 +389,17 @@ h2 {
   width: 42px;
   padding: 0;
 }
+
+.logout-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.logout-row .danger {
+  border-color: rgba(251, 113, 133, 0.45);
+  background: rgba(251, 113, 133, 0.12);
+}
+
 
 .profile-form {
   display: grid;
@@ -832,6 +846,10 @@ tr:hover td {
     display: block;
   }
 
+  .content {
+    padding-bottom: 96px;
+  }
+
   .sidebar {
     position: fixed;
     bottom: 0;
@@ -839,6 +857,7 @@ tr:hover td {
     right: 0;
     height: auto;
     min-height: 64px;
+
     border-right: 0;
     border-top: 1px solid var(--border);
     border-radius: 0;
@@ -938,6 +957,11 @@ tr:hover td {
     padding: 16px;
   }
 
+  .logout-row {
+    margin-top: 12px;
+  }
+
+
   .profile-photo-block {
     flex-direction: column;
     text-align: center;
@@ -963,8 +987,9 @@ tr:hover td {
 @media (max-width: 480px) {
   .content {
     padding: 12px;
-    padding-bottom: 72px;
+    padding-bottom: 92px;
   }
+
 
   .panel,
   .login-panel {
