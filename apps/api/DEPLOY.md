@@ -81,6 +81,34 @@ In production, ensure:
 - ✅ Development is fast and no setup needed
 - ✅ MySQL integration is ready for future stages
 
+## System Endpoints
+
+### GET /api/system/data-source
+
+Returns the current data source configuration without connecting to MySQL.
+
+**Authentication**: None required (public endpoint)
+
+**Response**:
+
+When `DATA_SOURCE=memory`:
+```json
+{
+  "dataSource": "memory",
+  "usingMysql": false
+}
+```
+
+When `DATA_SOURCE=mysql`:
+```json
+{
+  "dataSource": "mysql",
+  "usingMysql": true
+}
+```
+
+**Note**: This endpoint only reads the configuration. It does not connect to MySQL, ping the database, or execute any queries.
+
 ## Migration Path (Future)
 
 When ready to migrate to MySQL:

@@ -37,6 +37,14 @@ router.post('/auth/login', loginLimiter, async (req, res) => {
   return res.json({ token, user: payload });
 });
 
+// Diagnóstico del origen de datos (sin conexión a MySQL)
+router.get('/system/data-source', (_req, res) => {
+  res.json({
+    dataSource: config.DATA_SOURCE,
+    usingMysql: config.DATA_SOURCE === 'mysql'
+  });
+});
+
 router.use(requireAuth);
 
 router.get('/me', (req, res) => {
