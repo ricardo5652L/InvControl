@@ -327,3 +327,109 @@ export function validateUpdateProfile(body) {
     errors
   };
 }
+
+/**
+ * Valida los datos para crear un movimiento de inventario (POST /api/inventory/movements).
+ * @param {Object} body - Cuerpo de la solicitud
+ * @returns {{ valid: boolean, errors: string[] }} - Resultado de la validación
+ */
+export function validateInventoryMovement(body) {
+  const errors = [];
+
+  // product_id obligatorio - debe ser número entero positivo
+  if (body.product_id === undefined || body.product_id === null || body.product_id === '') {
+    errors.push('El ID del producto es obligatorio');
+  } else if (!isValidOptionalPositiveInt(body.product_id)) {
+    errors.push('El ID del producto debe ser un número entero válido');
+  }
+
+  // type obligatorio - solo puede ser IN, OUT o ADJUSTMENT
+  if (!body.type || !['IN', 'OUT', 'ADJUSTMENT'].includes(body.type)) {
+    errors.push('El tipo de movimiento es obligatorio y debe ser IN, OUT o ADJUSTMENT');
+  }
+
+  // quantity obligatorio - debe ser número positivo
+  if (body.quantity === undefined || body.quantity === null || body.quantity === '') {
+    errors.push('La cantidad es obligatoria');
+  } else if (!isValidNumber(body.quantity)) {
+    errors.push('La cantidad debe ser un número válido');
+  } else if (Number(body.quantity) <= 0) {
+    errors.push('La cantidad debe ser mayor a cero');
+  }
+
+  // reason opcional - si viene, debe ser string
+  if (body.reason !== undefined && body.reason !== null && body.reason !== '') {
+    if (typeof body.reason !== 'string') {
+      errors.push('El motivo debe ser un texto');
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+/**
+ * Valida los datos para crear una venta (POST /api/sales).
+ * @param {Object} body - Cuerpo de la solicitud
+ * @returns {{ valid: boolean, errors: string[] }} - Resultado de la validación
+ */
+export function validateCreateSale(body) {
+  const errors = [];
+
+  // items obligatorio - debe ser arreglo
+  if (!Array.isArray(body.items)) {
+    errors.push('Los items de la venta deben ser un arreglo');
+    return { valid: false, errors };
+  }
+
+  // items debe tener al menos un producto
+  if (body.items.length === 0) {
+    errors.push('La venta debe tener al menos un producto');
+    return { valid: false, errors };
+  }
+
+  // Validar cada item
+  for (let i = 0; i < body.items.length; i++) {
+    const item = body.items[i];
+    const prefix = `El item ${i + 1}:`;
+
+    // product_id obligatorio en cada item
+    if (item.product_id === undefined || item.product_id === null || item.product_id === '') {
+      errors.push(`${prefix} el ID del producto es obligatorio`);
+    } else if (!isValidOptionalPositiveInt(item.product_id)) {
+      errors.push(`${prefix} el ID del producto debe ser un número entero válido`);
+    }
+
+    // quantity obligatorio en cada item
+    if (item.quantity === undefined || item.quantity === null || item.quantity === '') {
+      errors.push(`${prefix} la cantidad es obligatoria`);
+    } else if (!isValidNumber(item.quantity)) {
+      errors.push(`${prefix} la cantidad debe ser un número válido`);
+    } else if (Number(item.quantity) <= 0) {
+      errors.push(`${prefix} la cantidad debe ser mayor a cero`);
+    }
+
+    // unit_price opcional - si viene, debe ser número no negativo
+    if (item.unit_price !== undefined && item.unit_price !== null && item.unit_price !== '') {
+      if (!isValidNumber(item.unit_price)) {
+        errors.push(`${prefix} el precio unitario debe ser un número válido`);
+      } else if (Number(item.unit_price) < 0) {
+        errors.push(`${prefix} el precio unitario no puede ser negativo`);
+      }
+    }
+  }
+
+  // payment_method opcional - si viene, debe ser string no vacío
+  if (body.payment_method !== undefined && body.payment_method !== null && body.payment_method !== '') {
+    if (typeof body.payment_method !== 'string' || body.payment_method.trim().length === 0) {
+      errors.push('El método de pago debe ser un texto');
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}

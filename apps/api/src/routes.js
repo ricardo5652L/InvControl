@@ -5,7 +5,7 @@ import { canAccessStore, requireAdmin, requireAuth } from './middleware.js';
 import { db, nextId, publicProduct } from './store.js';
 import { config } from './config.js';
 import { loginLimiter } from './security.js';
-import { validateCreateProduct, validateUpdateProduct, validateCreateUser, validateUpdateUser, validateUpdateProfile } from './validators.js';
+import { validateCreateProduct, validateUpdateProduct, validateCreateUser, validateUpdateUser, validateUpdateProfile, validateInventoryMovement, validateCreateSale } from './validators.js';
 
 export const router = Router();
 
@@ -253,10 +253,17 @@ router.get('/inventory/movements', (_req, res) => {
 
 router.post('/inventory/movements', (req, res) => {
   const { product_id, type, quantity, reason } = req.body;
+
+  // Validaciones básicas de datos
+  const validation = validateInventoryMovement(req.body);
+  if (!validation.valid) {
+    return res.status(400).json({ message: validation.errors[0] });
+  }
+
   const product = db.products.find((item) => item.id === Number(product_id) && item.isActive);
   const numericQuantity = Number(quantity);
 
-  if (!product || !canAccessStore(req, product.storeId) || !['IN', 'OUT', 'ADJUSTMENT'].includes(type) || numericQuantity <= 0) {
+  if (!product || !canAccessStore(req, product.storeId)) {
     return res.status(400).json({ message: 'Datos invalidos' });
   }
 
@@ -284,7 +291,12 @@ router.get('/sales', (_req, res) => {
 
 router.post('/sales', (req, res) => {
   const { items = [], payment_method = 'cash' } = req.body;
-  if (!Array.isArray(items) || items.length === 0) return res.status(400).json({ message: 'Venta sin productos' });
+
+  // Validaciones básicas de datos
+  const validation = validateCreateSale(req.body);
+  if (!validation.valid) {
+    return res.status(400).json({ message: validation.errors[0] });
+  }
 
   const resolved = [];
   for (const item of items) {
