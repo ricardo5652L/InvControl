@@ -97,15 +97,16 @@ export default function ProfileModal({ currentUser, theme, onThemeChange, onClos
             <button type="button" onClick={onClose}>Cancelar</button>
             <button className="primary" type="submit">Guardar cambios</button>
           </div>
-
-          {onLogout && (
-            <div className="logout-row">
-              <button type="button" className="ghost danger" onClick={onLogout}>
-                Cerrar sesión
-              </button>
-            </div>
-          )}
         </form>
+
+        {onLogout && (
+          <section className="session-section">
+            <h3>Sesión</h3>
+            <button type="button" className="danger logout-button" onClick={onLogout}>
+              Cerrar sesión
+            </button>
+          </section>
+        )}
       </section>
     </div>
   );

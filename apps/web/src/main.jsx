@@ -27,12 +27,22 @@ function App() {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user') || 'null'));
   const [view, setView] = useState('dashboard');
   const [profileOpen, setProfileOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem(THEME_KEY) || 'system');
 
   useEffect(() => {
     applyTheme(theme);
     localStorage.setItem(THEME_KEY, theme);
   }, [theme]);
+
+  useEffect(() => {
+    function handleResize() {
+      if (window.innerWidth > 768) setMobileMenuOpen(false);
+    }
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   function handleLogin(session) {
     localStorage.setItem('token', session.token);
@@ -47,9 +57,30 @@ function App() {
   }
 
   function logout() {
+    setMobileMenuOpen(false);
     localStorage.clear();
     setToken(null);
     setUser(null);
+  }
+
+  function selectView(nextView) {
+    setMobileMenuOpen(false);
+    setView(nextView);
+  }
+
+  function renderNavItems() {
+    return (
+      <>
+        <NavButton icon={<LayoutDashboard />} label="Dashboard" active={view === 'dashboard'} onClick={() => selectView('dashboard')} />
+        <NavButton icon={<ClipboardPlus />} label="Altas" active={view === 'quick'} onClick={() => selectView('quick')} />
+        <NavButton icon={<Boxes />} label="Productos" active={view === 'products'} onClick={() => selectView('products')} />
+        <NavButton icon={<PackagePlus />} label="Inventario" active={view === 'inventory'} onClick={() => selectView('inventory')} />
+        <NavButton icon={<ShoppingCart />} label="Ventas" active={view === 'sales'} onClick={() => selectView('sales')} />
+        <NavButton icon={<BarChart3 />} label="Reportes" active={view === 'reports'} onClick={() => selectView('reports')} />
+        {user?.role === 'admin' && <NavButton icon={<MapPinned />} label="Tiendas" active={view === 'stores'} onClick={() => selectView('stores')} />}
+        {user?.role === 'admin' && <NavButton icon={<UsersRound />} label="Usuarios" active={view === 'users'} onClick={() => selectView('users')} />}
+      </>
+    );
   }
 
   if (!token) return <Login onLogin={handleLogin} />;
@@ -64,23 +95,46 @@ function App() {
           </div>
         </div>
         <nav aria-label="Principal">
-          <NavButton icon={<LayoutDashboard />} label="Dashboard" active={view === 'dashboard'} onClick={() => setView('dashboard')} />
-          <NavButton icon={<ClipboardPlus />} label="Altas" active={view === 'quick'} onClick={() => setView('quick')} />
-          <NavButton icon={<Boxes />} label="Productos" active={view === 'products'} onClick={() => setView('products')} />
-          <NavButton icon={<PackagePlus />} label="Inventario" active={view === 'inventory'} onClick={() => setView('inventory')} />
-          <NavButton icon={<ShoppingCart />} label="Ventas" active={view === 'sales'} onClick={() => setView('sales')} />
-          <NavButton icon={<BarChart3 />} label="Reportes" active={view === 'reports'} onClick={() => setView('reports')} />
-          {user?.role === 'admin' && <NavButton icon={<MapPinned />} label="Tiendas" active={view === 'stores'} onClick={() => setView('stores')} />}
-          {user?.role === 'admin' && <NavButton icon={<UsersRound />} label="Usuarios" active={view === 'users'} onClick={() => setView('users')} />}
+          {renderNavItems()}
         </nav>
       </aside>
+
+      {mobileMenuOpen && (
+        <div
+          className="mobile-drawer-backdrop"
+          role="presentation"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
+      <nav
+        className={mobileMenuOpen ? 'mobile-drawer open' : 'mobile-drawer'}
+        aria-label="Menú móvil"
+        aria-hidden={!mobileMenuOpen}
+      >
+        <div className="mobile-drawer-top">
+          <img className="mobile-brand" src={logoUrl} alt="InvControl" />
+          <button type="button" className="mobile-menu-close" onClick={() => setMobileMenuOpen(false)} aria-label="Cerrar menú">
+            ×
+          </button>
+        </div>
+        <div className="mobile-drawer-items">
+          {renderNavItems()}
+        </div>
+      </nav>
+
       <main className="content">
         <div className="topbar topbar-desktop">
           <ProfileBubble user={user} onOpen={() => setProfileOpen(true)} />
         </div>
 
-        <div className="topbar-mobile" role="banner" aria-label="Topbar móvil">
-          <button type="button" className="mobile-menu-button" aria-label="Abrir menú">
+        <div className="topbar topbar-mobile" role="banner" aria-label="Topbar móvil">
+          <button
+            type="button"
+            className="mobile-menu-button"
+            aria-label="Abrir menú"
+            onClick={() => setMobileMenuOpen(true)}
+          >
             ☰
           </button>
           <div className="mobile-brand-title">
@@ -92,14 +146,16 @@ function App() {
           </div>
         </div>
 
-        {view === 'dashboard' && <Dashboard />}
-        {view === 'quick' && <QuickCreate setView={setView} isAdmin={user?.role === 'admin'} />}
-        {view === 'products' && <Products />}
-        {view === 'inventory' && <Inventory />}
-        {view === 'sales' && <Sales />}
-        {view === 'reports' && <Reports />}
-        {view === 'stores' && user?.role === 'admin' && <Stores />}
-        {view === 'users' && user?.role === 'admin' && <Users />}
+        <div className="page-view" key={view}>
+          {view === 'dashboard' && <Dashboard />}
+          {view === 'quick' && <QuickCreate setView={setView} isAdmin={user?.role === 'admin'} />}
+          {view === 'products' && <Products />}
+          {view === 'inventory' && <Inventory />}
+          {view === 'sales' && <Sales />}
+          {view === 'reports' && <Reports />}
+          {view === 'stores' && user?.role === 'admin' && <Stores />}
+          {view === 'users' && user?.role === 'admin' && <Users />}
+        </div>
       </main>
       {profileOpen && (
         <ProfileModal
