@@ -22,6 +22,7 @@ CREATE TABLE users (
   email VARCHAR(160) NOT NULL UNIQUE,
   password_hash VARCHAR(255) NOT NULL,
   role ENUM('admin','employee') NOT NULL DEFAULT 'employee',
+  photo_url VARCHAR(750000) NULL,
   is_active BOOLEAN NOT NULL DEFAULT TRUE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_users_store FOREIGN KEY (store_id) REFERENCES stores(id),
