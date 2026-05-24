@@ -6,6 +6,7 @@ import { db, nextId, publicProduct } from './store.js';
 import { config } from './config.js';
 import { loginLimiter } from './security.js';
 import { validateCreateProduct, validateUpdateProduct, validateCreateUser, validateUpdateUser, validateUpdateProfile, validateInventoryMovement, validateCreateSale, validateCreateStore, validateUpdateStore, validateSalesReportQuery, validateExportReportQuery } from './validators.js';
+import { storesRepository, usersRepository, productsRepository, inventoryRepository, salesRepository, categoriesRepository } from './repositories/index.js';
 
 export const router = Router();
 
