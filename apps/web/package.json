@@ -10,11 +10,12 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@vercel/speed-insights": "^2.0.0",
     "@vitejs/plugin-react": "6.0.2",
-    "vite": "8.0.14",
+    "lucide-react": "0.468.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "lucide-react": "0.468.0"
+    "vite": "8.0.14"
   },
   "devDependencies": {
     "vitest": "4.1.7"
