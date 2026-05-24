@@ -161,11 +161,21 @@ Tests MySQL connection only when `DATA_SOURCE=mysql`. Returns status without exe
 
 When ready to migrate to MySQL:
 
-1. Set `DATA_SOURCE=mysql`
-2. Configure database credentials
-3. Run database migrations from `database/migrations/001_init.sql`
-4. Gradually enable repository methods to use MySQL
-5. Test thoroughly with production-like data volumes
+### Para usar MySQL en el futuro (solo en entorno controlado)
+
+1) Crear la base y el esquema:
+- `database/migrations/001_init.sql`
+
+2) Cargar datos demo:
+- `database/seeds/001_demo.sql`
+
+3) Configurar variables `DB_*`
+
+4) Cambiar `DATA_SOURCE=mysql` **solo en entorno controlado**
+
+> En esta etapa NO se activa MySQL automáticamente: la configuración por defecto sigue siendo `DATA_SOURCE=memory`.
+
+
 
 **Note**: The repositories currently use the memory store. MySQL migration will happen in a separate, dedicated stage.
 
