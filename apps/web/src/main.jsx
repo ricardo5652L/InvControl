@@ -27,9 +27,7 @@ function App() {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user') || 'null'));
   const [view, setView] = useState('dashboard');
   const [profileOpen, setProfileOpen] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem(THEME_KEY) || 'system');
-
 
   useEffect(() => {
     applyTheme(theme);
@@ -49,18 +47,16 @@ function App() {
   }
 
   function logout() {
-    setMobileMenuOpen(false);
     localStorage.clear();
     setToken(null);
     setUser(null);
   }
 
-
   if (!token) return <Login onLogin={handleLogin} />;
 
   return (
     <div className="shell">
-      <aside className="sidebar desktop-sidebar">
+      <aside className="sidebar">
         <div className="brand">
           <img src={logoUrl} alt="InvControl" />
           <div>
@@ -68,119 +64,20 @@ function App() {
           </div>
         </div>
         <nav aria-label="Principal">
-          <NavButton icon={<LayoutDashboard />} label="Dashboard" active={view === 'dashboard'} onClick={() => {
-            setMobileMenuOpen(false);
-            setView('dashboard');
-          }} />
-          <NavButton icon={<ClipboardPlus />} label="Altas" active={view === 'quick'} onClick={() => {
-            setMobileMenuOpen(false);
-            setView('quick');
-          }} />
-          <NavButton icon={<Boxes />} label="Productos" active={view === 'products'} onClick={() => {
-            setMobileMenuOpen(false);
-            setView('products');
-          }} />
-          <NavButton icon={<PackagePlus />} label="Inventario" active={view === 'inventory'} onClick={() => {
-            setMobileMenuOpen(false);
-            setView('inventory');
-          }} />
-          <NavButton icon={<ShoppingCart />} label="Ventas" active={view === 'sales'} onClick={() => {
-            setMobileMenuOpen(false);
-            setView('sales');
-          }} />
-          <NavButton icon={<BarChart3 />} label="Reportes" active={view === 'reports'} onClick={() => {
-            setMobileMenuOpen(false);
-            setView('reports');
-          }} />
-          {user?.role === 'admin' && (
-            <NavButton icon={<MapPinned />} label="Tiendas" active={view === 'stores'} onClick={() => {
-              setMobileMenuOpen(false);
-              setView('stores');
-            }} />
-          )}
-          {user?.role === 'admin' && (
-            <NavButton icon={<UsersRound />} label="Usuarios" active={view === 'users'} onClick={() => {
-              setMobileMenuOpen(false);
-              setView('users');
-            }} />
-          )}
+          <NavButton icon={<LayoutDashboard />} label="Dashboard" active={view === 'dashboard'} onClick={() => setView('dashboard')} />
+          <NavButton icon={<ClipboardPlus />} label="Altas" active={view === 'quick'} onClick={() => setView('quick')} />
+          <NavButton icon={<Boxes />} label="Productos" active={view === 'products'} onClick={() => setView('products')} />
+          <NavButton icon={<PackagePlus />} label="Inventario" active={view === 'inventory'} onClick={() => setView('inventory')} />
+          <NavButton icon={<ShoppingCart />} label="Ventas" active={view === 'sales'} onClick={() => setView('sales')} />
+          <NavButton icon={<BarChart3 />} label="Reportes" active={view === 'reports'} onClick={() => setView('reports')} />
+          {user?.role === 'admin' && <NavButton icon={<MapPinned />} label="Tiendas" active={view === 'stores'} onClick={() => setView('stores')} />}
+          {user?.role === 'admin' && <NavButton icon={<UsersRound />} label="Usuarios" active={view === 'users'} onClick={() => setView('users')} />}
         </nav>
       </aside>
-
-      {mobileMenuOpen && (
-        <div
-          className="mobile-drawer-backdrop"
-          role="presentation"
-          onClick={() => setMobileMenuOpen(false)}
-        />
-      )}
-
-      <nav className={mobileMenuOpen ? 'mobile-drawer open' : 'mobile-drawer'} aria-label="Menú móvil" aria-hidden={!mobileMenuOpen}>
-        <div className="mobile-drawer-top">
-          <img className="mobile-brand" src={logoUrl} alt="InvControl" />
-          <button className="mobile-menu-close" onClick={() => setMobileMenuOpen(false)} aria-label="Cerrar menú">×</button>
-        </div>
-        <div className="mobile-drawer-items">
-          <NavButton icon={<LayoutDashboard />} label="Dashboard" active={view === 'dashboard'} onClick={() => {
-            setMobileMenuOpen(false);
-            setView('dashboard');
-          }} />
-          <NavButton icon={<ClipboardPlus />} label="Altas" active={view === 'quick'} onClick={() => {
-            setMobileMenuOpen(false);
-            setView('quick');
-          }} />
-          <NavButton icon={<Boxes />} label="Productos" active={view === 'products'} onClick={() => {
-            setMobileMenuOpen(false);
-            setView('products');
-          }} />
-          <NavButton icon={<PackagePlus />} label="Inventario" active={view === 'inventory'} onClick={() => {
-            setMobileMenuOpen(false);
-            setView('inventory');
-          }} />
-          <NavButton icon={<ShoppingCart />} label="Ventas" active={view === 'sales'} onClick={() => {
-            setMobileMenuOpen(false);
-            setView('sales');
-          }} />
-          <NavButton icon={<BarChart3 />} label="Reportes" active={view === 'reports'} onClick={() => {
-            setMobileMenuOpen(false);
-            setView('reports');
-          }} />
-          {user?.role === 'admin' && (
-            <NavButton icon={<MapPinned />} label="Tiendas" active={view === 'stores'} onClick={() => {
-              setMobileMenuOpen(false);
-              setView('stores');
-            }} />
-          )}
-          {user?.role === 'admin' && (
-            <NavButton icon={<UsersRound />} label="Usuarios" active={view === 'users'} onClick={() => {
-              setMobileMenuOpen(false);
-              setView('users');
-            }} />
-          )}
-        </div>
-      </nav>
-
       <main className="content">
-        <div className="topbar topbar-mobile">
-          <button
-            className="mobile-menu-button"
-            onClick={() => setMobileMenuOpen(true)}
-            aria-label="Abrir menú"
-            type="button"
-          >
-            ☰
-          </button>
-          <div className="mobile-brand-title">
-            <img className="mobile-brand" src={logoUrl} alt="InvControl" />
-            <span>InvControl</span>
-          </div>
+        <div className="topbar">
           <ProfileBubble user={user} onOpen={() => setProfileOpen(true)} />
         </div>
-
-        <div className="topbar topbar-desktop">
-          <ProfileBubble user={user} onOpen={() => setProfileOpen(true)} />
-        </div>
-
         {view === 'dashboard' && <Dashboard />}
         {view === 'quick' && <QuickCreate setView={setView} isAdmin={user?.role === 'admin'} />}
         {view === 'products' && <Products />}
