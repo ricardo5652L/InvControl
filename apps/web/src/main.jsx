@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BarChart3, Boxes, ClipboardPlus, EyeOff, LayoutDashboard, LogOut, MapPinned, PackagePlus, ShoppingCart, UsersRound } from 'lucide-react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import './styles.css';
 import logoUrl from './assets/invcontrol-logo.svg';
 import { api } from './api/client.js';
@@ -86,18 +87,20 @@ function App() {
   if (!token) return <Login onLogin={handleLogin} />;
 
   return (
-    <div className="shell">
-      <aside className="sidebar">
-        <div className="brand">
-          <img src={logoUrl} alt="InvControl" />
-          <div>
-            <small>{user?.storeName || user?.name}</small>
+    <>
+      <SpeedInsights />
+      <div className="shell">
+        <aside className="sidebar">
+          <div className="brand">
+            <img src={logoUrl} alt="InvControl" />
+            <div>
+              <small>{user?.storeName || user?.name}</small>
+            </div>
           </div>
-        </div>
-        <nav aria-label="Principal">
-          {renderNavItems()}
-        </nav>
-      </aside>
+          <nav aria-label="Principal">
+            {renderNavItems()}
+          </nav>
+        </aside>
 
       {mobileMenuOpen && (
         <div
@@ -167,7 +170,8 @@ function App() {
           onLogout={logout}
         />
       )}
-    </div>
+      </div>
+    </>
   );
 }
 
