@@ -5,7 +5,7 @@ import { canAccessStore, requireAdmin, requireAuth } from './middleware.js';
 import { db, nextId, publicProduct } from './store.js';
 import { config } from './config.js';
 import { loginLimiter } from './security.js';
-import { validateCreateProduct, validateUpdateProduct } from './validators.js';
+import { validateCreateProduct, validateUpdateProduct, validateCreateUser, validateUpdateUser, validateUpdateProfile } from './validators.js';
 
 export const router = Router();
 
@@ -48,18 +48,16 @@ router.put('/me', async (req, res) => {
   const user = db.users.find((item) => item.id === req.user.id && item.isActive);
   if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
 
+  // Validaciones de datos
+  const validation = validateUpdateProfile(req.body);
+  if (!validation.valid) {
+    return res.status(400).json({ message: validation.errors[0] });
+  }
+
   const { name, email, password, photo_url } = req.body;
 
   if (email && db.users.some((item) => item.id !== user.id && item.email.toLowerCase() === String(email).toLowerCase())) {
     return res.status(409).json({ message: 'Correo ya registrado' });
-  }
-
-  if (password !== undefined && password !== '' && String(password).length < 6) {
-    return res.status(400).json({ message: 'La contrasena debe tener al menos 6 caracteres' });
-  }
-
-  if (photo_url && (!String(photo_url).startsWith('data:image/') || String(photo_url).length > 750000)) {
-    return res.status(400).json({ message: 'Fotografia invalida o demasiado grande' });
   }
 
   if (name !== undefined) user.name = String(name).trim();
@@ -382,12 +380,10 @@ router.post('/users', requireAdmin, async (req, res) => {
   const { name, email, password, role = 'employee', store_id } = req.body;
   const storeId = Number(store_id || req.user.storeId || 1);
 
-  if (!name || !email || !password || password.length < 6) {
-    return res.status(400).json({ message: 'Nombre, correo y contrasena de al menos 6 caracteres son obligatorios' });
-  }
-
-  if (!['admin', 'employee'].includes(role)) {
-    return res.status(400).json({ message: 'Rol invalido' });
+  // Validaciones básicas de datos
+  const validation = validateCreateUser(req.body);
+  if (!validation.valid) {
+    return res.status(400).json({ message: validation.errors[0] });
   }
 
   if (!db.stores.some((store) => store.id === storeId && store.isActive)) {
@@ -419,14 +415,16 @@ router.put('/users/:id', requireAdmin, async (req, res) => {
   const user = db.users.find((item) => item.id === Number(req.params.id));
   if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
 
+  // Validaciones de datos
+  const validation = validateUpdateUser(req.body);
+  if (!validation.valid) {
+    return res.status(400).json({ message: validation.errors[0] });
+  }
+
   const { name, email, password, role, store_id, is_active } = req.body;
 
   if (email && db.users.some((item) => item.id !== user.id && item.email.toLowerCase() === String(email).toLowerCase())) {
     return res.status(409).json({ message: 'Correo ya registrado' });
-  }
-
-  if (role && !['admin', 'employee'].includes(role)) {
-    return res.status(400).json({ message: 'Rol invalido' });
   }
 
   if (store_id && !db.stores.some((store) => store.id === Number(store_id) && store.isActive)) {
