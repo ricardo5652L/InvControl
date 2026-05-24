@@ -7,6 +7,22 @@ Estos repositorios MySQL **NO están activos**. La API sigue usando los reposito
 - ✅ Repositorios en memoria: **ACTIVOS**
 - ❌ Repositorios MySQL: **PREPARADOS, pero INACTIVOS**
 
+## Cómo se Activarán
+
+Un **selector central** (`../provider.js`) elige automáticamente entre repositorios según `DATA_SOURCE`:
+
+```javascript
+import { getRepositories } from '../provider.js';
+
+// Si DATA_SOURCE=memory (predeterminado)
+const repos = getRepositories();  // → Repositorios en memoria
+
+// Si DATA_SOURCE=mysql (en etapa posterior)
+const repos = getRepositories();  // → Repositorios MySQL
+```
+
+El cambio será **transparente**: misma interfaz, mismo comportamiento desde la API.
+
 ## Propósito
 
 Estos repositorios están preparados como base para una futura migración a MySQL:
@@ -14,7 +30,7 @@ Estos repositorios están preparados como base para una futura migración a MySQ
 1. **Interfaz compatible**: Cada repositorio MySQL implementa las mismas funciones que su equivalente en memoria
 2. **Mapeo de datos**: Convierten automáticamente snake_case de MySQL a camelCase para mantener compatibilidad con la API actual
 3. **SQL parametrizado**: Todas las queries usan parámetros (`?`) para prevenir SQL injection
-4. **Sin activación automática**: Requieren activación explícita mediante `DATA_SOURCE=mysql`
+4. **Sin activación automática**: Solo se usan cuando `DATA_SOURCE=mysql`
 
 ## Estructura
 
@@ -147,16 +163,22 @@ En una etapa posterior dedicada a la migración a MySQL:
 
 ## Próximas Etapas
 
+### Selector Dinámico (✅ COMPLETADO - Etapa 8D)
+✅ Archivo `../provider.js` creado
+- `getRepositories()` elige automáticamente según `DATA_SOURCE`
+- `DATA_SOURCE=memory` → repositorios en memoria (actual)
+- `DATA_SOURCE=mysql` → repositorios MySQL (cuando esté listo)
+
 ### Etapa de Migración (Futura)
-1. Crear estrategia de **selector dinámico de repositorios** basado en `DATA_SOURCE`
-2. Conectar `routes.js` a los repositorios MySQL (con flag `DATA_SOURCE=mysql`)
-3. Ejecutar migraciones de datos
-4. Validar con tests e integración
-5. Cambiar `DATA_SOURCE` por defecto a `mysql` (opcional)
+1. Actualizar `routes.js` para usar `getRepositories()` del provider
+2. Ejecutar migraciones de datos de memoria a MySQL
+3. Validar con tests e integración
+4. Cambiar `DATA_SOURCE` por defecto a `mysql` (opcional)
 
 ## Referencias
 
 - Esquema SQL: `database/migrations/001_init.sql`
 - Configuración: `src/config.js`
 - Pool de conexión: `src/database.js`
+- Selector de repositorios: `src/repositories/provider.js` ✨ NUEVO
 - Repositorios en memoria: `src/repositories/` (parent)

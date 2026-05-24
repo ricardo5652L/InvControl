@@ -17,14 +17,47 @@ Los repositorios actuales son **adaptadores en memoria** que utilizan el objeto 
 - `sales.repository.js` - Operaciones para ventas y elementos de venta
 - `categories.repository.js` - Operaciones para categorías
 
+## Selector de Repositorios (provider.js)
+
+Existe un **selector central** que elige automáticamente entre repositorios en memoria y MySQL:
+
+```javascript
+// apps/api/src/repositories/provider.js
+
+import { getRepositories, getActiveDataSource } from './provider.js';
+
+const repos = getRepositories();  // Retorna repos según DATA_SOURCE
+const source = getActiveDataSource();  // Retorna 'memory' o 'mysql'
+```
+
+### Comportamiento
+
+- **Si `DATA_SOURCE=memory`** (predeterminado):
+  - `getRepositories()` devuelve repositorios en memoria
+  - La API funciona igual que ahora, sin cambios
+  
+- **Si `DATA_SOURCE=mysql`** (en etapa posterior):
+  - `getRepositories()` devuelve repositorios MySQL
+  - La API usa la base de datos MySQL automáticamente
+
+### Ventajas
+
+✅ Cambio transparente de fuente de datos
+✅ Sin modificar `routes.js` (se hará en etapa posterior)
+✅ Sin cambios en endpoints ni respuestas
+✅ MySQL no se activa por defecto
+✅ Preparado para migración futura
+
 ## Futura Migración a MySQL
 
 Cuando se realice la migración a MySQL:
 
-1. Cada repositorio se reemplazará por una implementación que use MySQL
-2. La interfaz de cada repositorio se mantendrá consistente
-3. Las rutas (`routes.js`) no necesitarán cambios significativos
-4. El comportamiento de la API permanecerá igual
+1. Los repositorios en MySQL ya están listos en la carpeta `mysql/`
+2. El selector `provider.js` elegirá automáticamente cuál usar
+3. Las rutas (`routes.js`) se actualizarán para usar `getRepositories()`
+4. La interfaz de cada repositorio se mantendrá consistente
+5. El comportamiento de la API permanecerá igual
+6. `DATA_SOURCE=mysql` se establecerá cuando esté listo
 
 ## Diferencias entre store.js y 001_init.sql
 
