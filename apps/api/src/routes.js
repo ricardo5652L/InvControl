@@ -4,10 +4,11 @@ import jwt from 'jsonwebtoken';
 import { canAccessStore, requireAdmin, requireAuth } from './middleware.js';
 import { db, nextId, publicProduct } from './store.js';
 import { config } from './config.js';
+import { loginLimiter } from './security.js';
 
 export const router = Router();
 
-router.post('/auth/login', async (req, res) => {
+router.post('/auth/login', loginLimiter, async (req, res) => {
   const { email, password } = req.body;
   const user = db.users.find((item) => item.email === email && item.isActive);
 
