@@ -75,9 +75,23 @@ function App() {
         </nav>
       </aside>
       <main className="content">
-        <div className="topbar">
+        <div className="topbar topbar-desktop">
           <ProfileBubble user={user} onOpen={() => setProfileOpen(true)} />
         </div>
+
+        <div className="topbar-mobile" role="banner" aria-label="Topbar móvil">
+          <button type="button" className="mobile-menu-button" aria-label="Abrir menú">
+            ☰
+          </button>
+          <div className="mobile-brand-title">
+            <img className="mobile-brand" src={logoUrl} alt="InvControl" />
+            <span>InvControl</span>
+          </div>
+          <div className="mobile-profile">
+            <ProfileBubble user={user} onOpen={() => setProfileOpen(true)} />
+          </div>
+        </div>
+
         {view === 'dashboard' && <Dashboard />}
         {view === 'quick' && <QuickCreate setView={setView} isAdmin={user?.role === 'admin'} />}
         {view === 'products' && <Products />}
