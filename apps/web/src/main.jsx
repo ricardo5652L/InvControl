@@ -4,33 +4,12 @@ import { AlertTriangle, BarChart3, Boxes, Camera, ClipboardPlus, Download, Eye, 
 import './styles.css';
 import { formatCurrency } from './utils.js';
 import logoUrl from './assets/invcontrol-logo.svg';
+import { api, API_URL } from './api/client.js';
 
-const API_URL = import.meta.env.VITE_API_URL || '/api';
 const THEME_KEY = 'invcontrol-theme';
 
 function applyTheme(theme) {
   document.documentElement.dataset.theme = theme || 'system';
-}
-
-async function api(path, options = {}) {
-  const token = localStorage.getItem('token');
-  const response = await fetch(`${API_URL}${path}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...options.headers
-    }
-  });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Error de red' }));
-    throw new Error(error.message || 'Error de API');
-  }
-
-  if (response.status === 204) return null;
-  const contentType = response.headers.get('content-type') || '';
-  return contentType.includes('application/json') ? response.json() : response.text();
 }
 
 function currency(value) {
@@ -533,7 +512,7 @@ function Reports() {
 
   async function download(type) {
     const token = localStorage.getItem('token');
-    const response = await fetch(`${API_URL}/reports/export.csv?type=${type}`, {
+    const response = await fetch(`${API_URL}reports/export.csv?type=${type}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     const blob = await response.blob();
