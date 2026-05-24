@@ -7,6 +7,7 @@ import { config } from './config.js';
 import { loginLimiter } from './security.js';
 import { validateCreateProduct, validateUpdateProduct, validateCreateUser, validateUpdateUser, validateUpdateProfile, validateInventoryMovement, validateCreateSale, validateCreateStore, validateUpdateStore, validateSalesReportQuery, validateExportReportQuery } from './validators.js';
 import { getRepositories } from './repositories/provider.js';
+import { testConnection } from './database.js';
 
 export const router = Router();
 
@@ -43,6 +44,42 @@ router.get('/system/data-source', (_req, res) => {
     dataSource: config.DATA_SOURCE,
     usingMysql: config.DATA_SOURCE === 'mysql'
   });
+});
+
+// Prueba de conexión MySQL (solo cuando DATA_SOURCE=mysql)
+router.get('/system/mysql-ping', async (_req, res) => {
+  if (config.DATA_SOURCE !== 'mysql') {
+    return res.json({
+      ok: true,
+      enabled: false,
+      message: 'MySQL no esta activo. DATA_SOURCE=memory'
+    });
+  }
+
+  try {
+    const connected = await testConnection();
+    if (connected) {
+      return res.json({
+        ok: true,
+        enabled: true,
+        connected: true
+      });
+    } else {
+      return res.status(500).json({
+        ok: false,
+        enabled: true,
+        connected: false,
+        message: 'No se pudo conectar a MySQL'
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      ok: false,
+      enabled: true,
+      connected: false,
+      message: 'No se pudo conectar a MySQL'
+    });
+  }
 });
 
 router.use(requireAuth);

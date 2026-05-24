@@ -109,6 +109,42 @@ When `DATA_SOURCE=mysql`:
 
 **Note**: This endpoint only reads the configuration. It does not connect to MySQL, ping the database, or execute any queries.
 
+### GET /api/system/mysql-ping
+
+Tests MySQL connection only when `DATA_SOURCE=mysql`. Returns status without executing business logic.
+
+**Authentication**: None required (public endpoint)
+
+**Response when DATA_SOURCE=memory** (HTTP 200):
+```json
+{
+  "ok": true,
+  "enabled": false,
+  "message": "MySQL no esta activo. DATA_SOURCE=memory"
+}
+```
+
+**Response when DATA_SOURCE=mysql and connection succeeds** (HTTP 200):
+```json
+{
+  "ok": true,
+  "enabled": true,
+  "connected": true
+}
+```
+
+**Response when DATA_SOURCE=mysql and connection fails** (HTTP 500):
+```json
+{
+  "ok": false,
+  "enabled": true,
+  "connected": false,
+  "message": "No se pudo conectar a MySQL"
+}
+```
+
+**Note**: This endpoint only connects to MySQL if `DATA_SOURCE=mysql`. It does not expose sensitive data (passwords, stack traces, or internal errors).
+
 ## Migration Path (Future)
 
 When ready to migrate to MySQL:
